@@ -17,6 +17,12 @@ public class PlayerAI {
         // Any instantiation code goes here
     }
 
+    public void resolveConflicts(World world, FriendlyUnit[] friendlyUnits, Point[][] priorities)
+    {
+    	for(int i = 0; i < friendlyUnits.length; i++)
+    		world.move(friendlyUnits[i], priorities[i][0]);
+    }
+
     /**
      * This method will get called every turn.
      *
@@ -30,11 +36,12 @@ public class PlayerAI {
         Build thou nests
         Grow, become stronger
         Take over the world */
-        for (FriendlyUnit unit: friendlyUnits) {
-            List<Point> path = world.getShortestPath(unit.getPosition(),
-                                                     world.getClosestCapturableTileFrom(unit.getPosition(), null).getPosition(),
-                                                     null);
-            if (path != null) world.move(unit, path.get(0));
-        }
+
+        Point[][] priorities = new Point[friendlyUnits.length][5];
+
+        for(int i = 0; i < friendlyUnits.length; i++)
+        	priorities[i][0] = new Point(0, 0);
+
+        resolveConflicts(world, friendlyUnits, priorities);
     }
 }
