@@ -1,26 +1,21 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.orbischallenge.firefly.client.objects.models.EnemyUnit;
 import com.orbischallenge.firefly.client.objects.models.FriendlyUnit;
 import com.orbischallenge.firefly.client.objects.models.World;
-import com.orbischallenge.firefly.client.objects.models.Tile;
-
 import com.orbischallenge.game.engine.Point;
-import com.orbischallenge.firefly.objects.enums.Direction;
-
-import com.orbischallenge.logging.Log;
-
-import java.util.*;
 
 public class PlayerAI {
     // Any field declarations go here
 
-    public PlayerAI() {
-        // Any instantiation code goes here
-    }
+	Map<String, ArrayList<Point>> tasks = new HashMap<String, ArrayList<Point>>();
 
-    public void resolveConflicts(World world, FriendlyUnit[] friendlyUnits, Point[][] priorities)
+    public void assignTasks(World world, List<FriendlyUnit> friendlyUnits)
     {
-    	for(int i = 0; i < friendlyUnits.length; i++)
-    		world.move(friendlyUnits[i], priorities[i][0]);
+    	
     }
 
     /**
@@ -37,11 +32,12 @@ public class PlayerAI {
         Grow, become stronger
         Take over the world */
 
-        Point[][] priorities = new Point[friendlyUnits.length][5];
+    	List<FriendlyUnit> newbies = new ArrayList<FriendlyUnit>();
+    	for(FriendlyUnit friend : friendlyUnits)
+    		if(!tasks.containsKey(friend.getUuid()))
+    			newbies.add(friend);
+    	assignTasks(world, newbies);
 
-        for(int i = 0; i < friendlyUnits.length; i++)
-        	priorities[i][0] = new Point(0, 0);
-
-        resolveConflicts(world, friendlyUnits, priorities);
+    	
     }
 }
