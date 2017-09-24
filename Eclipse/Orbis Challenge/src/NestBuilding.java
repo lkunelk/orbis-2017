@@ -182,16 +182,7 @@ public class NestBuilding extends Task {
 			System.out.println("wat " + nest);
 			System.exit(-1);
 		}
-//		for(FriendlyUnit friend : friendlyUnits)
-//		{
-//			System.out.println("uh oh");
-//			if(!(nest.getX() - 2 <= friend.getPosition().getX() && friend.getPosition().getX() <= nest.getX() + 2))
-//				System.exit(-1);
-//			if(!(nest.getY() - 2 <= friend.getPosition().getY() && friend.getPosition().getY() <= nest.getY() + 2))
-//				System.exit(-1);
-//			System.out.println("uh noh");
-//		}
-	
+
 		List<Point> adjacent = new ArrayList<Point>();
 		for(Tile neighbour : world.getTilesAround(nest).values())
 			if(neighbour.isNeutral())
@@ -199,7 +190,7 @@ public class NestBuilding extends Task {
 	
 		if(adjacent.size() == 0)
 			return;
-	
+
 		int[][][] distFromAdj = new int[adjacent.size()][19][19];
 		for(int i = 0; i < adjacent.size(); i++)
 		{
@@ -353,7 +344,7 @@ public class NestBuilding extends Task {
 							if((i & j) == 0 && (i & k) == 0 && (i & l) == 0 && (j & k) == 0 && (j & l) == 0 && (k & l) == 0 && (i | j | k | l) == (1 << adjacent.size()) - 1)
 								if(lookup[0][i] != Integer.MAX_VALUE && lookup[1][j] != Integer.MAX_VALUE && lookup[2][k] != Integer.MAX_VALUE && lookup[3][l] != Integer.MAX_VALUE)
 								{
-									if(best < Math.max(lookup[0][i], Math.max(lookup[1][j], Math.max(lookup[2][k], lookup[3][l]))))
+									if(Math.max(lookup[0][i], Math.max(lookup[1][j], Math.max(lookup[2][k], lookup[3][l]))) < best)
 									{
 										best = Math.max(lookup[0][i], Math.max(lookup[1][j], Math.max(lookup[2][k], lookup[3][l])));
 										dirs.clear();
@@ -373,16 +364,20 @@ public class NestBuilding extends Task {
 		for(int i = 0; i < dirs.size(); i++)
 		{
 			int j = dirs.get(i);
+			if(j == 0)
+				continue;
+
 			boolean f = false;
 			for(int k = 0; k < adjacent.size(); k++)
 				if(dist[i][j][k] == lookup[i][j])
 				{
 					int s = start[i][j][k];
+					System.out.println(friendlyUnits.get(0).getPosition() + " " + adjacent.get(start[i][j][k]));
 					boolean ff = false;
 					for(Tile adj : world.getTilesAround(friendlyUnits.get(i).getPosition()).values())
 					{
 						Point nxt = adj.getPosition();
-						if(distFromAdj[s][adj.getPosition().getX()][adj.getPosition().getY()] == 1 + distFromAdj[s][friendlyUnits.get(i).getPosition().getX()][friendlyUnits.get(i).getPosition().getY()])
+						if(distFromAdj[s][adj.getPosition().getX()][adj.getPosition().getY()] + 1 == distFromAdj[s][friendlyUnits.get(i).getPosition().getX()][friendlyUnits.get(i).getPosition().getY()])
 						{
 							world.move(friendlyUnits.get(i), adj.getPosition());
 							ff = true;

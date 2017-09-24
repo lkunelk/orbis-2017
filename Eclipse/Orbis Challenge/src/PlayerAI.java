@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ public class PlayerAI {
     	for(FriendlyUnit friend : friendlyUnits)
     	{
     		boolean any = false;
+    		int best = Integer.MAX_VALUE;
+    		Point ans = null;
     		for(Point p : ords)
     		{
     			List<FriendlyUnit> cur = new ArrayList<FriendlyUnit>();
@@ -52,15 +55,18 @@ public class PlayerAI {
     			int post = NestBuilding.calcTime(p, world, cur, board);
 
     			if(post < pre)
-    			{
-    				any = true;
-    				tasks.put(friend.getUuid(), new NestBuilding(p));
-    				break;
-    			}
+    				if(post < best)
+	    			{
+    					best = post;
+	    				any = true;
+	    				ans = p;
+	    			}
     		}
 
     		if(!any)
 				tasks.put(friend.getUuid(), new FortressBuilding());
+    		else
+    			tasks.put(friend.getUuid(), new NestBuilding(ans));
     	}
 
     	for(Point p : ords)
@@ -125,6 +131,6 @@ public class PlayerAI {
     	System.out.println(nestBuilders.size());
 
     	for(Map.Entry<Point, List<FriendlyUnit>> entry : nestBuilders.entrySet())
-    		NestBuilding.buildNest(entry.getKey(), world, entry.getValue(), board);
+    		NestBuilding.BuildNest(entry.getKey(), world, entry.getValue(), board);
     }
 }
