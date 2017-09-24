@@ -14,7 +14,8 @@ public class PlayerAI {
 	private State[][] board = new State[19][19];
 
     public void assignTasks(World world, List<FriendlyUnit> friendlyUnits) {
-    	
+    	for(FriendlyUnit u: friendlyUnits)
+    		tasks.put(u.getUuid(), new FortressBuilding());
     }
 
     /**
@@ -30,15 +31,16 @@ public class PlayerAI {
         Build thou nests
         Grow, become stronger
         Take over the world */
-
+    	
     	List<FriendlyUnit> newbies = new ArrayList<FriendlyUnit>();
     	for(FriendlyUnit friend : friendlyUnits)
     		if(!tasks.containsKey(friend.getUuid()))
     			newbies.add(friend);
     	assignTasks(world, newbies);
 
+    	board = new State[19][19];
 //    	buildNests();
-//    	buildFortress();
+    	FortressBuilding.buildFortress(world, friendlyUnits, enemyUnits, tasks, board);
     }
 
 //    public void buildNests(World world, FriendlyUnit[] friendlyUnits, EnemyUnit[] enemyUnits) {
