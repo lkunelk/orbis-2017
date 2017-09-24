@@ -11,7 +11,13 @@ import com.orbischallenge.game.engine.Point;
 public class PlayerAI {
     // Any field declarations go here
 
+	private enum State
+	{
+		NEST, BUILDER
+	}
+
 	Map<String, ArrayList<Point>> tasks = new HashMap<String, ArrayList<Point>>();
+	State[][] board = new State[19][19];
 
     public void assignTasks(World world, List<FriendlyUnit> friendlyUnits)
     {
