@@ -17,11 +17,13 @@ public class FortressBuilding extends Task {
     	//stores index of unit as a position on map
     	unitPos = new int[19][19];
     	blocked = new boolean[19][19];
+    	boolean[][] sb = new boolean[19][19];
     	for(int i = 0; i < 19*19; i++)unitPos[i/19][i%19] = -1;
     	for(int i = 0; i < friendlyUnits.length; i++) {
     		Point p = friendlyUnits[i].getPosition();
-    		if(tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.FortressBuilder) {
+    		if(tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.FortressBuilder || tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder) {
     			unitPos[p.getY()][p.getX()] = i;
+    			sb[p.getY()][p.getX()] = tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder;
     		} else {
     			blocked[p.getY()][p.getX()] = true;
     		}
@@ -34,6 +36,8 @@ public class FortressBuilding extends Task {
     	
     	//contains shortest path from nest to an empty point
     	for(Point nest: world.getFriendlyNestPositions()) {
+    		if(sb[nest.getY()][nest.getX()])
+    			continue;
     		path = new ArrayList<Point>();
     		blocked[nest.getY()][nest.getX()] = true;
     		BFS(world, nest);
@@ -118,10 +122,16 @@ public class FortressBuilding extends Task {
     	for(int i = 0; i < path.size()-1; i++){
     		Point p1 = path.get(i);
     		Point p2 = path.get(i+1);
-    		
+    		System.out.println(p2 + " --> " + p1);
     		deb("p2 "+p2);
     		
     		int ind = unitPos[p2.getY()][p2.getX()];
+    		if(ind == -1)
+    		{
+    			System.out.println("noooo");
+    			System.exit(-1);
+    		}
+//    		blocked[p1.getY()][p1.getX()] = true;
     		world.move(fu[ind], p1);
     	}
     }
