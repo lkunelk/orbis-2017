@@ -10,10 +10,6 @@ import com.orbischallenge.firefly.client.objects.models.World;
 public class PlayerAI {
     // Any field declarations go here
 
-	private enum State {
-		NEST, BUILDER
-	}
-
 	private Map<String, Task> tasks = new HashMap<String, Task>();
 	private State[][] board = new State[19][19];
 
