@@ -8,6 +8,7 @@ import com.orbischallenge.firefly.client.objects.models.EnemyUnit;
 import com.orbischallenge.firefly.client.objects.models.FriendlyUnit;
 import com.orbischallenge.firefly.client.objects.models.Tile;
 import com.orbischallenge.firefly.client.objects.models.World;
+import com.orbischallenge.firefly.objects.enums.Direction;
 import com.orbischallenge.game.engine.Point;
 
 public class PlayerAI {
@@ -103,13 +104,17 @@ public class PlayerAI {
 
     	buildNests(world, friendlyUnits, enemyUnits);
     	FortressBuilding.buildFortress(world, friendlyUnits, enemyUnits, tasks, board);
-
-    	try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	
+    	//attack whenever you see someone
+    	for(FriendlyUnit u: friendlyUnits) {
+    		for(EnemyUnit e: enemyUnits) {
+    			Map<Direction, Point> m = world.getNeighbours(u.getPosition());
+    			if(m.get(Direction.NORTH).equals(e.getPosition())) world.move(u, m.get(Direction.NORTH));
+    			if(m.get(Direction.SOUTH).equals(e.getPosition())) world.move(u, m.get(Direction.SOUTH));
+    			if(m.get(Direction.EAST).equals(e.getPosition())) world.move(u, m.get(Direction.EAST));
+    			if(m.get(Direction.WEST).equals(e.getPosition())) world.move(u, m.get(Direction.WEST));
+    		}
+    	}
     }
 
     public void buildNests(World world, FriendlyUnit[] friendlyUnits, EnemyUnit[] enemyUnits) {
