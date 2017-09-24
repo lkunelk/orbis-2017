@@ -6,21 +6,18 @@ import java.util.Map;
 import com.orbischallenge.firefly.client.objects.models.EnemyUnit;
 import com.orbischallenge.firefly.client.objects.models.FriendlyUnit;
 import com.orbischallenge.firefly.client.objects.models.World;
-import com.orbischallenge.game.engine.Point;
 
 public class PlayerAI {
     // Any field declarations go here
 
-	private enum State
-	{
+	private enum State {
 		NEST, BUILDER
 	}
 
-	Map<String, ArrayList<Point>> tasks = new HashMap<String, ArrayList<Point>>();
-	State[][] board = new State[19][19];
+	private Map<String, Task> tasks = new HashMap<String, Task>();
+	private State[][] board = new State[19][19];
 
-    public void assignTasks(World world, List<FriendlyUnit> friendlyUnits)
-    {
+    public void assignTasks(World world, List<FriendlyUnit> friendlyUnits) {
     	
     }
 
@@ -44,6 +41,11 @@ public class PlayerAI {
     			newbies.add(friend);
     	assignTasks(world, newbies);
 
-    	
+//    	buildNests();
+//    	buildFortress();
     }
+
+//    public void buildNests(World world, FriendlyUnit[] friendlyUnits, EnemyUnit[] enemyUnits) {
+//    	
+//    }
 }
