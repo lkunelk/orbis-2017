@@ -17,23 +17,10 @@ public class PlayerAI {
 
 	private Map<String, Task> tasks = new HashMap<String, Task>();
 	private State[][] board = new State[19][19];
-
-	Point[] ords = {
-		new Point(13, 11),
-		new Point(14, 13),
-//		new POint(15, 15),
-
-		new Point(11, 12),
-		new Point(12, 14),
-		new Point(13, 16),
-//
-		new Point( 9, 13),
-		new Point(10, 15),
-		new Point(11, 17),
-	};
+	private List<Point> ords = new ArrayList<Point>();
 
     public void assignTasks(World world, List<FriendlyUnit> friendlyUnits, List<FriendlyUnit> all) {
-  
+
     	for(FriendlyUnit friend : friendlyUnits)
     	{
     		boolean any = false;
@@ -64,15 +51,16 @@ public class PlayerAI {
 	    			}
     		}
 
-    		if(!any)
+    		if(friend.getHealth() > 99)
+    			tasks.put(friend.getUuid(), new NestBreaking(world.getClosestEnemyNestFrom(friend.getPosition(), null)));
+    		else if(!any)
 				tasks.put(friend.getUuid(), new FortressBuilding());
     		else
     			tasks.put(friend.getUuid(), new NestBuilding(ans));
     	}
-
-    	for(Point p : ords)
-    		board[p.getX()][p.getY()] = State.NEST;
     }
+
+    int turns = 0;
 
     /**
      * This method will get called every turn.
@@ -87,6 +75,69 @@ public class PlayerAI {
         Build thou nests
         Grow, become stronger
         Take over the world */
+
+    	if(turns == 0) {
+    		Point nest = world.getNestPositions()[0];
+
+    		int[][][] pos = new int[][][]{
+    			{{1, -2}, {2, 1}, {-1, 2}, {-2, -1}, {-1, -3}, {-3, 1}, {3, -1}, {1, 3}},
+    			{{1, -2}, {2, -4}, {2, 1}, {3, -1}, {4, -3}, {4, 2}, {5, 0}, {6, -2}},
+    			{{-2, 4}, {-1, 2}, {0, 5}, {1, 3}, {2, 1}, {2, 6}, {3, 4}, {4, 3}},
+    			{{-6, 2}, {-5, 0}, {-4, -2}, {-4, 3}, {-3, 1}, {-2, -1}, {-2, 4}, {-1, 2}},
+    			{{-4, -2}, {-3, -4}, {-2, -6}, {-2, -1}, {-1, -3}, {0, -5}, {1, -2}, {2, -4}},
+    		};
+    		boolean first = true;
+    		int best = -1;
+    		int[][] ans = null;
+    		for(int[][] p : pos)
+    		{
+    			int dist = Integer.MAX_VALUE;
+    			for(int i = 0; i < 8; i++)
+    			{
+    				Point cur = new Point(nest.getX() + p[i][0], nest.getY() + p[i][1]);
+    				List<EnemyUnit> dis = new ArrayList<EnemyUnit>();
+    				dist = Math.min(dist, world.getTaxiCabDistance(cur, world.getClosestEnemyFrom(cur, dis).getPosition()));
+    				if(dist <= best)
+    					break;
+    			}
+    			if(first)
+    				dist++;
+    			if(dist > best)
+    			{
+    				best = dist;
+    				ans = p;
+    			}
+
+    			dist = Integer.MAX_VALUE;
+    			for(int i = 0; i < 8; i++)
+    			{
+    				Point cur = new Point(nest.getX() + p[i][1], nest.getY() + p[i][0]);
+    				List<EnemyUnit> dis = new ArrayList<EnemyUnit>();
+    				dist = Math.min(dist, world.getTaxiCabDistance(cur, world.getClosestEnemyFrom(cur, dis).getPosition()));
+    				if(dist <= best)
+    					break;
+    			}
+    			if(first)
+    				dist++;
+    			if(dist > best)
+    			{
+    				best = dist;
+    				ans = new int[p.length][2];
+    				for(int i = 0; i < p.length; i++)
+    				{
+    					ans[i][0] = p[i][1];
+    					ans[i][1] = p[i][0];
+    				}
+    			}
+    			first = false;
+    		}
+    		for(int[] knight : ans) {
+    			Point nxt = new Point((nest.getX() + knight[0] + 19) % 19, (nest.getY() + knight[1] + 19) % 19);
+    			ords.add(nxt);
+    			board[nxt.getX()][nxt.getY()] = State.NEST;
+    		}
+    	}
+    	turns++;
 
     	for(FriendlyUnit friend : friendlyUnits)
     		if(tasks.containsKey(friend.getUuid()))
@@ -110,7 +161,7 @@ public class PlayerAI {
 
     	buildNests(world, friendlyUnits, enemyUnits);
     	FortressBuilding.buildFortress(world, friendlyUnits, enemyUnits, tasks, board);
-    	
+    	NestBreaking.breakNest(world, friendlyUnits, board, tasks);
     	//attack whenever you see someone
     	for(FriendlyUnit u: friendlyUnits) {
     		for(EnemyUnit e: enemyUnits) {
@@ -133,7 +184,6 @@ public class PlayerAI {
 
     			nestBuilders.get(((NestBuilding) tasks.get(friend.getUuid())).getNestPosition()).add(friend);
     		}
-    	System.out.println(nestBuilders.size());
 
     	for(Map.Entry<Point, List<FriendlyUnit>> entry : nestBuilders.entrySet())
     		NestBuilding.BuildNest(entry.getKey(), world, entry.getValue(), board);

@@ -21,18 +21,13 @@ public class FortressBuilding extends Task {
     	for(int i = 0; i < 19*19; i++)unitPos[i/19][i%19] = -1;
     	for(int i = 0; i < friendlyUnits.length; i++) {
     		Point p = friendlyUnits[i].getPosition();
-    		if(tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.FortressBuilder || tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder) {
+    		if(tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.FortressBuilder || tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder || tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBreaker) {
     			unitPos[p.getY()][p.getX()] = i;
-    			sb[p.getY()][p.getX()] = tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder;
+    			sb[p.getY()][p.getX()] = tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBuilder || tasks.get(friendlyUnits[i].getUuid()).getType() == Task.Type.NestBreaker;
     		} else {
     			blocked[p.getY()][p.getX()] = true;
     		}
     	}
-//    	for(int i = 0; i < 19; i++) {
-//			for(int j = 0; j < 19; j++)
-//				System.out.print(unitPos[i][j]+",");
-//			System.out.println();
-//    	}
     	
     	//contains shortest path from nest to an empty point
     	for(Point nest: world.getFriendlyNestPositions()) {
@@ -41,8 +36,6 @@ public class FortressBuilding extends Task {
     		path = new ArrayList<Point>();
     		blocked[nest.getY()][nest.getX()] = true;
     		BFS(world, nest);
-    		
-    		deb(nest);
     		
     		shiftFortress(world, friendlyUnits);
     	}
@@ -87,13 +80,6 @@ public class FortressBuilding extends Task {
     		}
     	}
     	
-    	for(int i = 0; i < 19; i++) {
-    		for(int j = 0; j < 19; j++)
-    			if(dist[i][j]<10)System.out.print(dist[i][j]+",");
-    			else System.out.print(".,");
-    		System.out.println();
-    	}
-    	
     	//backtrack
     	for(int i = dist[gy][gx]; i >= 0 ; i--) {
     		path.add(new Point(gx, gy));
@@ -122,32 +108,13 @@ public class FortressBuilding extends Task {
     	for(int i = 0; i < path.size()-1; i++){
     		Point p1 = path.get(i);
     		Point p2 = path.get(i+1);
-    		System.out.println(p2 + " --> " + p1);
-    		deb("p2 "+p2);
     		
     		int ind = unitPos[p2.getY()][p2.getX()];
-    		if(ind == -1)
-    		{
-    			System.out.println("noooo");
-    			System.exit(-1);
-    		}
-//    		blocked[p1.getY()][p1.getX()] = true;
     		world.move(fu[ind], p1);
     	}
-    }
-    
-    public static void deb(Object o) {
-    	System.out.println(o);
     }
     
 	public Type getType() {
 		return Task.Type.FortressBuilder;
 	}
 }
-
-
-//for(int i = 0; i < 19; i++) {
-//	for(int j = 0; j < 19; j++)
-//		System.out.print(occupied[i][j]?"0":".");
-//	System.out.println();
-//}

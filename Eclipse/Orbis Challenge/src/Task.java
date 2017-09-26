@@ -1,6 +1,6 @@
 public abstract class Task {
 	enum Type {
-		NestBuilder, FortressBuilder
+		NestBuilder, FortressBuilder, NestBreaker
 	}
 
 	abstract Type getType();
